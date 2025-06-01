@@ -1,8 +1,10 @@
+import { Select } from "antd"
 import { BsThreeDots } from "react-icons/bs"
 import { CgArrowTopRight } from "react-icons/cg"
 import { GoDotFill } from "react-icons/go"
 import { IoIosArrowRoundDown } from "react-icons/io"
 import { IoNotificationsOutline } from "react-icons/io5"
+import { Cell, Legend, Pie, PieChart, PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart, RadialBar, RadialBarChart, ResponsiveContainer } from "recharts"
 
 const data = [
     {
@@ -49,6 +51,51 @@ const data = [
     },
 ];
 
+
+const data1 = [
+    { name: "Compliance", value: 6500000 },
+    { name: "Not Compliance", value: 4500000 },
+    { name: "Unknown", value: 2500000 },
+];
+
+const COLORS1 = ["#E91F27", "#007AFC", "#F2F2F2"];
+
+const data2 = [
+    { name: 'Project profitability', value: 77, color: '#D32F2F' },  // Red
+    { name: 'Labor utilization', value: 54, color: '#4285F4' },       // Blue
+    { name: 'Safety compliance', value: 39, color: '#000000' },       // Black
+];
+
+const CustomDonutChart = ({ value, color }: { value: number; color: string }) => {
+    const chartData = [
+        { name: 'completed', value },
+        { name: 'remaining', value: 100 - value },
+    ];
+
+    return (
+        <div className="flex flex-col items-center">
+            <PieChart width={100} height={100}>
+                <Pie
+                    data={chartData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={32}
+                    outerRadius={45}
+                    startAngle={90}
+                    endAngle={-270}
+                    dataKey="value"
+                >
+                    <Cell key="completed" fill={color} />
+                    <Cell key="remaining" fill="#f0f0f0" />
+                </Pie>
+            </PieChart>
+            <div className="absolute text-center" style={{ marginTop: '-70px' }}>
+                <div className="text-xs text-gray-500">Completed</div>
+                <div className="font-bold text-sm">{value}%</div>
+            </div>
+        </div>
+    );
+};
 
 const Dashboard = () => {
     return (
@@ -178,8 +225,20 @@ const Dashboard = () => {
             </div>
 
             <div className="mt-[30px] grid grid-cols-3 gap-x-[22px]">
-                <div className="col-span-2 p-5 rounded-[20px] border border-[#DCE2F1]">
-
+                <div className="col-span-2 p-5 rounded-[20px] border border-[#DCE2F1] flex flex-col">
+                    <div className="flex items-center justify-between">
+                        <span className="text-[#140001] text-2xl">Project timelines</span>
+                        <Select
+                            className="w-[130px]"
+                            defaultValue={'monthly'}
+                            options={[
+                                {
+                                    label: 'Monthly',
+                                    value: 'monthly',
+                                }
+                            ]}
+                        />
+                    </div>
                 </div>
 
                 <div className="col-span-1 p-5 rounded-[20px] border border-[#DCE2F1] flex flex-col">
@@ -194,19 +253,147 @@ const Dashboard = () => {
             <div className="mt-[30px] grid grid-cols-3 gap-x-[22px]">
                 <div className="col-span-1 p-5 rounded-[20px] border border-[#DCE2F1]">
                     <span className="text-[#140001] text-2xl">Compliance metrics</span>
+                    <div className="flex justify-center items-center">
+                        <PieChart width={300} height={300}>
+                            <Pie
+                                data={data1}
+                                innerRadius={80}
+                                outerRadius={110}
+                                fill="#8884d8"
+                                paddingAngle={1}
+                                dataKey="value"
+                                labelLine={false}
+                                startAngle={90}
+                                endAngle={-270}
+                            >
+                                {data1.map((_, index) => (
+                                    <Cell key={`cell-${index}`} fill={COLORS1[index]} />
+                                ))}
+                            </Pie>
+                            {/* <Tooltip formatter={(v) => `$${(v / 1e6).toFixed(2)}M`} /> */}
+                            <Legend
+                                layout="horizontal"
+                                verticalAlign="bottom"
+                                align="center"
+                                iconSize={8}
+                                wrapperStyle={{
+                                    fontSize: "12px",
+                                    marginTop: "8px",
+                                    color: "#230C0D",
+                                }}
+                            />
+                        </PieChart>
+                    </div>
                 </div>
 
                 <div className="col-span-2 p-5 rounded-[20px] border border-[#DCE2F1] flex flex-col">
                     <span className="text-[#140001] text-2xl">Access KPIs</span>
 
-                    <div className="mt-10">
+                    <div className="mt-10 grid grid-cols-3 gap-x-5 flex-1">
+                        <div className="flex flex-col items-center justify-between">
+                            <div className="relative w-[144px] h-[144px] my-5">
+                                <PieChart width={144} height={144}>
+                                    <Pie
+                                        data={[
+                                            { name: 'completed', value: 77 },
+                                            { name: 'remaining', value: 100 - 77 },
+                                        ]}
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={54}
+                                        outerRadius={72}
+                                        startAngle={90}
+                                        endAngle={-270}
+                                        dataKey="value"
+                                    >
+                                        <Cell key="completed" fill={'#E91F27'} />
+                                        <Cell key="remaining" fill="#f0f0f0" />
+                                    </Pie>
+                                </PieChart>
 
+                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+                                    <span className="text-[#737373] text-xs">Completed</span>
+                                    <span className="text-[#0A0A0A] text-xl font-semibold">77%</span>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center mt-7">
+                                <GoDotFill className="text-[#E91F27] text-xl" />
+                                <span className="text-[#3F191A] text-xs">Project proftability</span>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col items-center justify-between">
+                            <div className="relative w-[144px] h-[144px] my-5">
+                                <PieChart width={144} height={144}>
+                                    <Pie
+                                        data={[
+                                            { name: 'completed', value: 54 },
+                                            { name: 'remaining', value: 100 - 54 },
+                                        ]}
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={54}
+                                        outerRadius={72}
+                                        startAngle={90}
+                                        endAngle={-270}
+                                        dataKey="value"
+                                    >
+                                        <Cell key="completed" fill={'#007AFC'} />
+                                        <Cell key="remaining" fill="#f0f0f0" />
+                                    </Pie>
+                                </PieChart>
+
+                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+                                    <span className="text-[#737373] text-xs">Completed</span>
+                                    <span className="text-[#0A0A0A] text-xl font-semibold">54%</span>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center mt-7">
+                                <GoDotFill className="text-[#007AFC] text-xl" />
+                                <span className="text-[#3F191A] text-xs">Labor utilization</span>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col items-center justify-between">
+                            <div className="relative w-[144px] h-[144px] my-5">
+                                <PieChart width={144} height={144}>
+                                    <Pie
+                                        data={[
+                                            { name: 'completed', value: 39 },
+                                            { name: 'remaining', value: 100 - 39 },
+                                        ]}
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={54}
+                                        outerRadius={72}
+                                        startAngle={90}
+                                        endAngle={-270}
+                                        dataKey="value"
+                                    >
+                                        <Cell key="completed" fill={'#000'} />
+                                        <Cell key="remaining" fill="#f0f0f0" />
+                                    </Pie>
+                                </PieChart>
+
+                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+                                    <span className="text-[#737373] text-xs">Completed</span>
+                                    <span className="text-[#0A0A0A] text-xl font-semibold">39%</span>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center mt-7">
+                                <GoDotFill className="text-[#000] text-xl" />
+                                <span className="text-[#3F191A] text-xs">Project proftability</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div className="mt-5 p-5 rounded-[20px] border border-[#DCE2F1]">
-                <span className="text-[#140001] text-2xl">Compliance metrics</span>
+                <span className="text-[#140001] text-2xl">Upcoming Deadlines</span>
 
                 <div className="mt-5 grid grid-cols-[2fr_2fr_3fr] gap-x-5">
                     <div className="flex flex-col gap-y-4">
